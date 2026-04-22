@@ -767,22 +767,18 @@ section { position: relative; z-index: 2; }
 .tm-card:hover { border-color: var(--border2); transform: translateY(-5px); box-shadow: 0 30px 80px rgba(0,0,0,0.5); }
 .tm-card:hover::before { opacity: 1; }
 
-.tm-ring {
+.tm-img {
   width: 80px; height: 80px;
   border-radius: 50%;
+  object-fit: cover;
   border: 1.5px solid var(--border2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: block;
   margin: 0 auto 1.75rem;
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 1.8rem;
-  color: var(--g);
-  background: rgba(0,232,122,0.05);
-  box-shadow: 0 0 30px rgba(0,232,122,0.1), inset 0 0 30px rgba(0,232,122,0.04);
-  transition: box-shadow 0.3s;
+  background: var(--black2);
+  box-shadow: 0 0 30px rgba(0,232,122,0.1);
+  transition: box-shadow 0.3s, transform 0.3s;
 }
-.tm-card:hover .tm-ring { box-shadow: 0 0 50px rgba(0,232,122,0.25), inset 0 0 30px rgba(0,232,122,0.08); }
+.tm-card:hover .tm-img { box-shadow: 0 0 50px rgba(0,232,122,0.25); transform: scale(1.05); }
 
 .tm-name { font-family: 'Outfit', sans-serif; font-size: 1.15rem; font-weight: 600; margin-bottom: 0.3rem; }
 .tm-role { font-size: 0.8rem; color: var(--g); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.6rem; }
@@ -1238,13 +1234,13 @@ footer {
     <h2 class="big-title reveal reveal-d1">Two engineers.<br>One platform.</h2>
     <div class="team-grid">
       <div class="tm-card reveal reveal-d3">
-        <div class="tm-ring">MH</div>
+        <img src="./assets/haseeb-amjad.jpg" alt="M. Haseeb Amjad" class="tm-img">
         <div class="tm-name">M. Haseeb Amjad</div>
         <div class="tm-role">Frontend Engineer</div>
         <div class="tm-id">CIIT/SP23-BSE-035/ISB</div>
       </div>
       <div class="tm-card reveal reveal-d2">
-        <div class="tm-ring">MK</div>
+        <img src="./assets/mahad-kamran.jpg" alt="Mahad Kamran" class="tm-img">
         <div class="tm-name">Mahad Kamran</div>
         <div class="tm-role">Backend Engineer</div>
         <div class="tm-id">CIIT/SP23-BSE-023/ISB</div>
