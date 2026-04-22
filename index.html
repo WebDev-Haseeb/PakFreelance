@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PakFreelance — Reimagining Freelancing in Pakistan</title>
+<link rel="icon" type="image/x-icon" href="./assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@200;300;400;500;600&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+<style>
+:root {
+  --g: #00E87A;
+  --g2: #00C464;
+  --g3: #008C46;
+  --black: #050806;
+  --black2: #0A0F0B;
+  --card: rgba(255,255,255,0.03);
+  --border: rgba(0,232,122,0.12);
+  --border2: rgba(0,232,122,0.25);
+  --text: #F0FFF4;
+  --muted: #4D7A5E;
+  --muted2: #2A4535;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--black);
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  font-weight: 300;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* ── SCROLLBAR & SELECTION ── */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--black);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 232, 122, 0.3);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 232, 122, 0.6);
+}
+
+::selection {
+  background: rgba(0, 232, 122, 0.3);
+  color: #fff;
+}
+
+/* ── CUSTOM CURSOR ── */
+#cursor {
+  position: fixed;
+  width: 12px; height: 12px;
+  background: var(--g);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transition: transform 0.1s, background 0.2s, opacity 0.2s;
+  mix-blend-mode: exclusion;
+}
+#cursor-ring {
+  position: fixed;
+  width: 36px; height: 36px;
+  border: 1px solid rgba(0,232,122,0.4);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  transition: transform 0.25s cubic-bezier(.17,.67,.35,.99), width 0.3s, height 0.3s;
+  transform: translate(-12px,-12px);
+}
+body:has(a:hover) #cursor { transform: scale(2.5); }
+body:has(.nav-pill:hover, .cta-main:hover, .sol-tag:hover) #cursor { background: #fff; }
+body:has(a:hover) #cursor-ring { width: 52px; height: 52px; border-color: rgba(0,232,122,0.7); }
+
+/* ── CANVAS ── */
+#bg-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ── NOISE OVERLAY ── */
+body::after {
+  content:'';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  opacity: 0.022;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.4rem 3rem;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.4s, background 0.4s, backdrop-filter 0.4s;
+}
+nav.scrolled {
+  background: rgba(5,8,6,0.8);
+  backdrop-filter: blur(20px);
+  border-color: var(--border);
+}
+
+.nav-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.6rem;
+  letter-spacing: 0.08em;
+  color: var(--text);
+  text-decoration: none;
+}
+.nav-logo em { color: var(--g); font-style: normal; }
+
+.nav-links {
+  display: flex;
+  gap: 2.5rem;
+  list-style: none;
+}
+.nav-links a {
+  font-size: 0.78rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--g); }
+
+.nav-pill {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  background: var(--g);
+  color: var(--black);
+  padding: 0.55rem 1.4rem;
+  border-radius: 100px;
+  text-decoration: none;
+  font-weight: 400;
+  transition: box-shadow 0.25s, transform 0.2s;
+  letter-spacing: 0.03em;
+}
+.nav-pill:hover {
+  box-shadow: 0 0 30px rgba(0,232,122,0.5), 0 0 60px rgba(0,232,122,0.2);
+  transform: translateY(-2px);
+}
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+  padding: 7rem 3rem 5rem;
+  text-align: center;
+  overflow: hidden;
+}
+
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--g);
+  border: 1px solid var(--border);
+  padding: 0.45rem 1.1rem;
+  border-radius: 4px;
+  margin-top: 2.5rem;
+  margin-bottom: 2rem;
+  background: rgba(0,232,122,0.04);
+}
+
+.hero-eyebrow span {
+  width: 6px; height: 6px;
+  background: var(--g);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--g);
+  animation: blink 1.8s infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+.hero-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(5rem, 14vw, 13rem);
+  line-height: 0.92;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  margin-bottom: 0;
+  position: relative;
+}
+.hero-title .line2 {
+  display: block;
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(0,232,122,0.4);
+}
+.hero-title .line3 {
+  display: block;
+  background: linear-gradient(90deg, var(--g), #00FFB3, var(--g2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  background-size: 200%;
+  animation: shimmer 4s linear infinite;
+}
+@keyframes shimmer { 0%{background-position:0%} 100%{background-position:200%} }
+
+.hero-sub-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1100px;
+  margin: 3rem auto 0;
+  text-align: left;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+.hero-desc {
+  font-size: 1rem;
+  color: var(--muted);
+  line-height: 1.75;
+  max-width: 360px;
+  font-weight: 300;
+}
+.hero-stats-mini {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.h-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+.h-stat-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2.2rem;
+  color: var(--g);
+  letter-spacing: 0.03em;
+}
+.h-stat-label {
+  font-size: 0.78rem;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.hero-cta-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.cta-main {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  background: var(--g);
+  color: var(--black);
+  padding: 0;
+  width: 250px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all 0.25s;
+  letter-spacing: 0.01em;
+  box-sizing: border-box;
+}
+.cta-main:hover { box-shadow: 0 0 40px rgba(0,232,122,0.45); transform: translateY(-2px); }
+.cta-ghost {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text);
+  text-decoration: none;
+  padding: 0;
+  width: 250px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  transition: all 0.25s;
+  box-sizing: border-box;
+}
+.cta-ghost:hover { background: rgba(0,232,122,0.08); border-color: var(--g); transform: translateY(-2px); }
+
+/* ── SCROLL INDICATOR ── */
+.scroll-hint {
+  position: relative;
+  margin-top: 4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  color: var(--muted2);
+  text-transform: uppercase;
+}
+.scroll-line {
+  width: 1px;
+  height: 50px;
+  background: linear-gradient(to bottom, var(--g), transparent);
+  animation: drip 2s ease-in-out infinite;
+}
+@keyframes drip {
+  0%,100%{transform:scaleY(1);opacity:1}
+  50%{transform:scaleY(0.4);opacity:0.3}
+}
+
+/* ── TICKER ── */
+.ticker-wrap {
+  position: relative;
+  z-index: 2;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background: rgba(0,232,122,0.02);
+  overflow: hidden;
+  padding: 0.85rem 0;
+}
+.ticker-track {
+  display: flex;
+  gap: 0;
+  animation: ticker 30s linear infinite;
+  width: max-content;
+}
+@keyframes ticker { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+.ticker-item {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0 2.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.ticker-dot { color: var(--g); font-size: 1rem; }
+
+/* ── SECTION BASE ── */
+section { position: relative; z-index: 2; }
+.container { max-width: 1140px; margin: 0 auto; padding: 0 3rem; }
+.pad { padding: 8rem 0; }
+
+.section-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--g);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.section-label::before {
+  content:'';
+  width: 28px; height: 1px;
+  background: var(--g);
+}
+
+.big-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2.8rem, 6vw, 5.5rem);
+  line-height: 0.95;
+  letter-spacing: 0.01em;
+  margin-bottom: 1.5rem;
+}
+
+/* ── PROBLEM ── */
+.problem-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 6rem;
+  align-items: start;
+}
+.problem-sticky {
+  position: sticky;
+  top: 7rem;
+}
+.problem-desc {
+  font-size: 1rem;
+  color: var(--muted);
+  line-height: 1.8;
+  font-weight: 300;
+  margin-top: 1.5rem;
+}
+.problem-cards { display: flex; flex-direction: column; gap: 1px; }
+
+.p-card {
+  display: flex;
+  gap: 2rem;
+  padding: 2.5rem;
+  border: 1px solid var(--border);
+  background: var(--card);
+  transition: background 0.3s, border-color 0.3s, transform 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+.p-card::before {
+  content:'';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 2px;
+  background: var(--g);
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform 0.4s cubic-bezier(.17,.67,.35,.99);
+}
+.p-card:hover { background: rgba(0,232,122,0.04); border-color: var(--border2); transform: translateX(6px); }
+.p-card:hover::before { transform: scaleY(1); }
+.p-card:first-child { border-radius: 12px 12px 0 0; }
+.p-card:last-child { border-radius: 0 0 12px 12px; }
+
+.p-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 3rem;
+  color: var(--muted2);
+  line-height: 1;
+  flex-shrink: 0;
+  transition: color 0.3s;
+}
+.p-card:hover .p-num { color: var(--g3); }
+.p-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: var(--text);
+}
+.p-body { font-size: 0.88rem; color: var(--muted); line-height: 1.7; font-weight: 300; }
+
+/* ── SOLUTION BANNER ── */
+.solution-banner {
+  padding: 5rem 3rem;
+  background: linear-gradient(135deg, rgba(0,232,122,0.07), rgba(0,140,70,0.03));
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.solution-banner::before {
+  content:'';
+  position: absolute;
+  width: 700px; height: 700px;
+  background: radial-gradient(circle, rgba(0,232,122,0.08) 0%, transparent 65%);
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  pointer-events: none;
+}
+.sol-big {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  letter-spacing: 0.04em;
+  line-height: 1;
+  margin-bottom: 1.5rem;
+}
+.sol-big .g { color: var(--g); }
+.sol-tags {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+}
+.sol-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  color: var(--g);
+  border: 1px solid var(--border2);
+  padding: 0.4rem 1rem;
+  border-radius: 100px;
+  text-transform: uppercase;
+  background: rgba(0,232,122,0.05);
+}
+
+/* ── FEATURES ── */
+.feat-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 4rem;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+.feat-header-right {
+  font-size: 0.88rem;
+  color: var(--muted);
+  max-width: 280px;
+  line-height: 1.7;
+  font-weight: 300;
+}
+.feat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.f-card {
+  background: var(--black2);
+  padding: 2.5rem 2rem;
+  transition: background 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+.f-card::after {
+  content:'';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 0%, rgba(0,232,122,0.08), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.f-card:hover { background: #0D1410; }
+.f-card:hover::after { opacity: 1; }
+
+.f-glyph {
+  font-size: 2rem;
+  margin-bottom: 1.75rem;
+  display: block;
+  filter: grayscale(0.2);
+  transition: transform 0.3s, filter 0.3s;
+}
+.f-card:hover .f-glyph { transform: scale(1.1) rotate(-3deg); filter: none; }
+
+.f-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.01em;
+}
+.f-desc { font-size: 0.84rem; color: var(--muted); line-height: 1.7; font-weight: 300; }
+
+.f-card.featured {
+  grid-column: span 2;
+  background: linear-gradient(135deg, rgba(0,232,122,0.06), rgba(0,100,50,0.04));
+  border-right: 1px solid var(--border);
+}
+.f-card.featured .f-title { font-size: 1.2rem; }
+
+/* ── AI SECTION ── */
+.ai-wrap {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+.ai-left {}
+.ai-modules-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+.ai-mod {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.2rem;
+  background: var(--card);
+  transition: all 0.25s;
+  font-size: 0.84rem;
+}
+.ai-mod:hover { border-color: var(--border2); background: rgba(0,232,122,0.04); transform: translateY(-2px); }
+.ai-mod-icon { font-size: 1.4rem; margin-bottom: 0.6rem; display: block; }
+.ai-mod-name { font-weight: 500; color: var(--text); font-size: 0.82rem; }
+.ai-mod-sub { color: var(--muted); font-size: 0.75rem; margin-top: 0.2rem; line-height: 1.4; font-weight: 300; }
+
+.ai-right {
+  background: var(--black2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+.ai-right::before {
+  content:'';
+  position: absolute;
+  width: 300px; height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,232,122,0.1), transparent 70%);
+  top: -100px; right: -100px;
+  pointer-events: none;
+}
+
+.terminal-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+.t-dot { width: 10px; height: 10px; border-radius: 50%; }
+.t-dot.r { background: #FF5F57; }
+.t-dot.y { background: #FFBD2E; }
+.t-dot.g { background: #27C93F; }
+.t-title { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--muted); margin-left: auto; }
+
+.t-line {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  line-height: 2.1;
+  color: var(--muted);
+  display: flex;
+  gap: 0.75rem;
+}
+.t-prompt { color: var(--g); flex-shrink: 0; }
+.t-cmd { color: var(--text); }
+.t-out { color: var(--muted); }
+.t-val { color: #00FFB3; }
+.t-cursor {
+  display: inline-block;
+  width: 8px; height: 1.1em;
+  background: var(--g);
+  animation: blink 1s step-end infinite;
+  vertical-align: text-bottom;
+  margin-left: 2px;
+}
+@keyframes cur { 0%,100%{opacity:1} 50%{opacity:0} }
+
+/* ── TECH ── */
+.tech-section {
+  padding: 6rem 0;
+  border-top: 1px solid var(--border);
+}
+.tech-scrolltrack {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 3rem;
+}
+.tech-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  border: 1px solid var(--border);
+  padding: 0.6rem 1.3rem;
+  border-radius: 100px;
+  font-size: 0.82rem;
+  color: var(--muted);
+  background: var(--card);
+  transition: all 0.25s;
+  letter-spacing: 0.03em;
+}
+.tech-chip:hover {
+  color: var(--g);
+  border-color: var(--g);
+  background: rgba(0,232,122,0.05);
+  transform: scale(1.04);
+  box-shadow: 0 0 20px rgba(0,232,122,0.1);
+}
+.tech-chip .ver {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--muted2);
+}
+
+/* ── DOCS ── */
+.docs-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-top: 3rem;
+}
+
+.doc-icon { font-size: 2.2rem; margin-bottom: 1.2rem; display: inline-block; color: #fff; }
+.doc-card {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 2rem 1.5rem;
+  background: var(--card);
+  text-decoration: none;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+  group: true;
+}
+.doc-card:hover { border-color: var(--border2); background: rgba(0,232,122,0.04); transform: translateY(-4px); box-shadow: 0 20px 60px rgba(0,0,0,0.4); opacity: 1; }
+.doc-card::after {
+  content: '↗';
+  position: absolute;
+  top: 1.2rem; right: 1.5rem;
+  font-size: 1rem;
+  color: var(--muted2);
+  transition: color 0.2s, transform 0.3s;
+}
+.doc-card:hover::after { color: var(--g); transform: translate(2px,-2px); }
+
+.doc-name {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 0.35rem;
+}
+.doc-type {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--muted2);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* ── TEAM ── */
+.team-section { padding: 8rem 0; border-top: 1px solid var(--border); }
+.team-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  max-width: 760px;
+  margin: 4rem auto 0;
+}
+.tm-card {
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3rem 2.5rem;
+  background: var(--card);
+  text-align: center;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+.tm-card::before {
+  content:'';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(0,232,122,0.04), transparent 50%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.tm-card:hover { border-color: var(--border2); transform: translateY(-5px); box-shadow: 0 30px 80px rgba(0,0,0,0.5); }
+.tm-card:hover::before { opacity: 1; }
+
+.tm-ring {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.75rem;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.8rem;
+  color: var(--g);
+  background: rgba(0,232,122,0.05);
+  box-shadow: 0 0 30px rgba(0,232,122,0.1), inset 0 0 30px rgba(0,232,122,0.04);
+  transition: box-shadow 0.3s;
+}
+.tm-card:hover .tm-ring { box-shadow: 0 0 50px rgba(0,232,122,0.25), inset 0 0 30px rgba(0,232,122,0.08); }
+
+.tm-name { font-family: 'Outfit', sans-serif; font-size: 1.15rem; font-weight: 600; margin-bottom: 0.3rem; }
+.tm-role { font-size: 0.8rem; color: var(--g); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.6rem; }
+.tm-id {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--muted2);
+  letter-spacing: 0.06em;
+}
+
+.supervisor-note {
+  text-align: center;
+  margin-top: 2.5rem;
+  font-size: 0.82rem;
+  color: var(--muted2);
+  font-weight: 300;
+  line-height: 1.7;
+}
+.supervisor-note strong { color: var(--muted); font-weight: 400; }
+
+/* ── FOOTER ── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 3rem 0;
+  position: relative;
+  z-index: 2;
+}
+.foot-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+.foot-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.4rem;
+  letter-spacing: 0.08em;
+  color: var(--text);
+}
+.foot-logo em { color: var(--g); font-style: normal; }
+.foot-center {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--muted2);
+  letter-spacing: 0.12em;
+  text-align: center;
+  line-height: 1.8;
+  text-transform: uppercase;
+}
+.foot-right {
+  font-size: 0.78rem;
+  color: var(--muted2);
+  text-align: right;
+  font-weight: 300;
+  line-height: 1.7;
+}
+
+/* ── REVEAL ANIMATIONS ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s cubic-bezier(.17,.67,.35,.99), transform 0.8s cubic-bezier(.17,.67,.35,.99);
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-d1 { transition-delay: 0.1s; }
+.reveal-d2 { transition-delay: 0.2s; }
+.reveal-d3 { transition-delay: 0.3s; }
+.reveal-d4 { transition-delay: 0.4s; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 1024px) {
+  .feat-grid { grid-template-columns: repeat(2, 1fr); }
+  .f-card.featured { grid-column: span 1; }
+  .ai-wrap { grid-template-columns: 1fr; }
+  .docs-grid { grid-template-columns: repeat(2, 1fr); }
+  .problem-layout { grid-template-columns: 1fr; gap: 3rem; }
+  .problem-sticky { position: static; }
+}
+@media (max-width: 768px) {
+  nav { padding: 1.2rem 1.5rem; }
+  .nav-links { display: none; }
+  .hero { padding: 6rem 1.5rem 4rem; }
+  .hero-sub-row { flex-direction: column; gap: 2rem; }
+  .hero-cta-group { align-items: flex-start; }
+  .container { padding: 0 1.5rem; }
+  .feat-grid { grid-template-columns: 1fr; }
+  .team-grid { grid-template-columns: 1fr; max-width: 380px; }
+  .docs-grid { grid-template-columns: 1fr 1fr; }
+  .foot-inner { flex-direction: column; text-align: center; }
+  .foot-right { text-align: center; }
+}
+@media (max-width: 480px) {
+  .docs-grid { grid-template-columns: 1fr; }
+  .ai-modules-grid { grid-template-columns: 1fr; }
+  #cursor, #cursor-ring { display: none; }
+  body { cursor: auto; }
+}
+/* ── BACK TO TOP ── */
+#back-to-top {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 45px;
+  height: 45px;
+  background: var(--g);
+  color: var(--black);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  font-size: 1.2rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s, transform 0.3s, box-shadow 0.3s;
+  z-index: 99;
+  box-shadow: 0 4px 15px rgba(0, 232, 122, 0.3);
+}
+#back-to-top.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+#back-to-top:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 232, 122, 0.5);
+}
+</style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- CANVAS BACKGROUND -->
+<canvas id="bg-canvas"></canvas>
+
+<!-- NAV -->
+<nav id="mainNav">
+  <a href="#" class="nav-logo">Pak<em>Freelance</em></a>
+  <ul class="nav-links">
+    <li><a href="#problem">Problem</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#ai">Intelligence</a></li>
+    <li><a href="#team">Team</a></li>
+  </ul>
+  <a href="#docs" class="nav-pill">View Project →</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div style="max-width:1140px;width:100%;margin:0 auto;display:flex;flex-direction:column;align-items:center;">
+    <div class="hero-eyebrow reveal"><span></span>Final Year Project · COMSATS University Islamabad · 2023–2027</div>
+    <h1 class="hero-title reveal reveal-d1">
+      PAK
+      <span class="line2">FREE</span>
+      <span class="line3">LANCE</span>
+    </h1>
+    <div class="hero-sub-row reveal reveal-d2">
+      <p class="hero-desc">A localized, AI-assisted freelancing platform purpose-built for Pakistan — with domestic payments, milestone escrow, and minimal reliance on foreign intermediaries.</p>
+      <div class="hero-stats-mini">
+        <div class="h-stat"><span class="h-stat-num">≤5%</span><span class="h-stat-label">Commission</span></div>
+        <div class="h-stat"><span class="h-stat-num">10</span><span class="h-stat-label">Modules</span></div>
+        <div class="h-stat"><span class="h-stat-num">90%</span><span class="h-stat-label">Fraud Detection</span></div>
+      </div>
+      <div class="hero-cta-group">
+        <a href="#features" class="cta-main">Explore Platform</a>
+        <a href="#docs" class="cta-ghost">View Documentation ↗</a>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    Scroll
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker-track" id="ticker">
+    <div class="ticker-item"><span class="ticker-dot">◆</span> Escrow Payment System</div>
+    <div class="ticker-item"><span class="ticker-dot">◆</span> KYC Verification</div>
+    <div class="ticker-item"><span class="ticker-dot">◆</span> AI Milestone Generation</div>
+    <div class="ticker-item"><span class="ticker-dot">◆</span> Local Payments</div>
+    <div class="ticker-item"><span class="ticker-dot">◆</span> COCOMO-II Estimation</div>
+    <div class="ticker-item"><span class="ticker-dot">◆</span> Dispute Resolution</div>
+    <div class="ticker-item"><span class="ticker-dot">◆</span> Sprint Planning</div>
+    <div class="ticker-item"><span class="ticker-dot">◆</span> Multi-Freelancer Teams</div>
+    <div class="ticker-item"><span class="ticker-dot">◆</span> Fraud Detection</div>
+    <div class="ticker-item"><span class="ticker-dot">◆</span> Real-Time Messaging</div>
+    <!-- duplicate for seamless loop -->
+    <div class="ticker-item"><span class="ticker-dot">◆</span> Escrow Payment System</div>
+    <div class="ticker-item"><span class="ticker-dot">◆</span> KYC Verification</div>
+    <div class="ticker-item"><span class="ticker-dot">◆</span> AI Milestone Generation</div>
+    <div class="ticker-item"><span class="ticker-dot">◆</span> Local Payments</div>
+    <div class="ticker-item"><span class="ticker-dot">◆</span> COCOMO-II Estimation</div>
+    <div class="ticker-item"><span class="ticker-dot">◆</span> Dispute Resolution</div>
+    <div class="ticker-item"><span class="ticker-dot">◆</span> Sprint Planning</div>
+    <div class="ticker-item"><span class="ticker-dot">◆</span> Multi-Freelancer Teams</div>
+    <div class="ticker-item"><span class="ticker-dot">◆</span> Fraud Detection</div>
+    <div class="ticker-item"><span class="ticker-dot">◆</span> Real-Time Messaging</div>
+  </div>
+</div>
+
+<!-- PROBLEM -->
+<section id="problem" class="pad">
+  <div class="container">
+    <div class="problem-layout">
+      <div class="problem-sticky">
+        <div class="section-label reveal">The Problem</div>
+        <h2 class="big-title reveal reveal-d1">Global platforms<br>were not built<br>for Pakistan</h2>
+        <p class="problem-desc reveal reveal-d2">Fiverr, Upwork, and Freelancer.com operate under financial structures that systematically disadvantage Pakistani professionals. The cost is real, measurable, and ongoing.</p>
+      </div>
+      <div class="problem-cards reveal reveal-d1">
+        <div class="p-card">
+          <div class="p-num">01</div>
+          <div>
+            <div class="p-title">Fee structures of 10 to 20 percent</div>
+            <p class="p-body">Tiered commission models take a compounding cut of every transaction. A freelancer earning $30,000 annually loses between $3,000 and $6,000 to platform fees before a single expense is paid.</p>
+          </div>
+        </div>
+        <div class="p-card">
+          <div class="p-num">02</div>
+          <div>
+            <div class="p-title">Mandatory 14-day payment cooldowns</div>
+            <p class="p-body">Funds earned cannot be withdrawn for two weeks after a project closes. For professionals managing monthly obligations, this restriction creates predictable, recurring financial stress.</p>
+          </div>
+        </div>
+        <div class="p-card">
+          <div class="p-num">03</div>
+          <div>
+            <div class="p-title">No domestic payment support</div>
+            <p class="p-body">None of the major platforms offer native integration with Pakistani mobile wallets or local bank transfers. Every withdrawal passes through costly international intermediaries.</p>
+          </div>
+        </div>
+        <div class="p-card">
+          <div class="p-num">04</div>
+          <div>
+            <div class="p-title">Informal work carries no protection</div>
+            <p class="p-body">Social media freelancing — the default alternative — offers no escrow, no structured contract, and no recourse when a client refuses to pay or a freelancer fails to deliver.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOLUTION BANNER -->
+<div class="solution-banner">
+  <p class="sol-big reveal">
+    <span class="g">LOCALIZED.</span> SECURE.<br>
+    <span class="g">AI-ASSISTED.</span>
+  </p>
+  <p style="color:var(--muted);max-width:520px;margin:0 auto;font-size:0.95rem;font-weight:300;line-height:1.8;" class="reveal reveal-d1">
+    PakFreelance replaces every one of these gaps with purpose-built infrastructure — domestic payments, enforced escrow, intelligent planning tools, and verified identities on both sides of every contract.
+  </p>
+  <div class="sol-tags reveal reveal-d2">
+    <span class="sol-tag">Zindagi API</span>
+    <span class="sol-tag">Escrow Protected</span>
+    <span class="sol-tag">KYC Verified</span>
+    <span class="sol-tag">AI Planning</span>
+    <span class="sol-tag">Admin Governed</span>
+    <span class="sol-tag">Audit Logged</span>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section id="features" class="pad">
+  <div class="container">
+    <div class="feat-header">
+      <div>
+        <div class="section-label reveal">Platform Features</div>
+        <h2 class="big-title reveal reveal-d1">Everything the<br>lifecycle needs</h2>
+      </div>
+      <p class="feat-header-right reveal reveal-d2">Ten modules cover the complete arc from user onboarding to final payment settlement — without gaps.</p>
+    </div>
+    <div class="feat-grid reveal reveal-d1">
+      <div class="f-card featured">
+        <span class="f-glyph"><i class="ph ph-lock-key"></i></span>
+        <div class="f-title">Milestone-Based Escrow System</div>
+        <p class="f-desc">Client funds are deposited per milestone and held until verified delivery. No money changes hands without both parties confirming completion. The admin layer provides a final audit trail on every transaction, with webhook callbacks from Stripe and Zindagi confirming settlement.</p>
+      </div>
+      <div class="f-card">
+        <span class="f-glyph"><i class="ph ph-identification-card"></i></span>
+        <div class="f-title">KYC Verification</div>
+        <p class="f-desc">CNIC-based identity checks via Sumsub ensure every user is a real, traceable individual. AI flags inconsistencies before admin review.</p>
+      </div>
+      <div class="f-card">
+        <span class="f-glyph"><i class="ph ph-bank"></i></span>
+        <div class="f-title">Local Payment Integration</div>
+        <p class="f-desc">Zindagi wallet and direct bank transfer. No currency conversion delays. No foreign intermediary cuts.</p>
+      </div>
+      <div class="f-card">
+        <span class="f-glyph"><i class="ph ph-clipboard-text"></i></span>
+        <div class="f-title">Project Bidding Marketplace</div>
+        <p class="f-desc">Clients post structured briefs. Freelancers submit AI-assisted proposals with optimised bid amounts and persuasive pitch generation.</p>
+      </div>
+      <div class="f-card">
+        <span class="f-glyph"><i class="ph ph-shopping-bag"></i></span>
+        <div class="f-title">Gig Marketplace</div>
+        <p class="f-desc">Freelancers list tiered service packages with AI-generated copy, SEO visibility scores, and real-time performance analytics.</p>
+      </div>
+      <div class="f-card">
+        <span class="f-glyph"><i class="ph ph-scales"></i></span>
+        <div class="f-title">Dispute Resolution</div>
+        <p class="f-desc">AI synthesises evidence, chat logs, and milestone history into settlement recommendations. Admins issue binding decisions with one click.</p>
+      </div>
+      <div class="f-card">
+        <span class="f-glyph"><i class="ph ph-users-three"></i></span>
+        <div class="f-title">Multi-Freelancer Teams</div>
+        <p class="f-desc">Team-based contracts with AI-recommended role assignments, shared milestone tracking, and proportional payment distribution.</p>
+      </div>
+      <div class="f-card">
+        <span class="f-glyph"><i class="ph ph-chats-circle"></i></span>
+        <div class="f-title">Secure Real-Time Messaging</div>
+        <p class="f-desc">WebSocket chat with AI summaries, voice note transcription, file versioning, and group channels for team projects.</p>
+      </div>
+      <div class="f-card">
+        <span class="f-glyph"><i class="ph ph-chart-bar"></i></span>
+        <div class="f-title">Admin Analytics Dashboard</div>
+        <p class="f-desc">Centralised oversight of escrow balances, fraud alerts, dispute queues, and platform commission — exportable to PDF or CSV.</p>
+      </div>
+      <div class="f-card featured">
+        <span class="f-glyph"><i class="ph ph-shield-check"></i></span>
+        <div class="f-title">Platform Governance & Moderation</div>
+        <p class="f-desc">Comprehensive system administration tools that give full control over user activities, financial audits, platform disputes, and policy enforcement.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AI SECTION -->
+<section id="ai" class="pad" style="border-top:1px solid var(--border);">
+  <div class="container">
+    <div class="section-label reveal">Module 10</div>
+    <div class="ai-wrap">
+      <div class="ai-left">
+        <h2 class="big-title reveal reveal-d1">AI Project<br>Intelligence<br>Engine</h2>
+        <p style="color:var(--muted);font-size:0.92rem;line-height:1.8;font-weight:300;max-width:420px;margin-top:1rem;" class="reveal reveal-d2">Seven interconnected engines that automate the hardest parts of project management — from requirement expansion to risk-adjusted effort estimation and negotiation simulation.</p>
+        <div class="ai-modules-grid reveal reveal-d2">
+          <div class="ai-mod">
+            <span class="ai-mod-icon"><i class="ph ph-ruler"></i></span>
+            <div class="ai-mod-name">Requirement Engine</div>
+            <div class="ai-mod-sub">Expands sparse project briefs into structured specs</div>
+          </div>
+          <div class="ai-mod">
+            <span class="ai-mod-icon"><i class="ph ph-target"></i></span>
+            <div class="ai-mod-name">Milestone Generator</div>
+            <div class="ai-mod-sub">Auto-creates deliverables, acceptance criteria, and sequencing</div>
+          </div>
+          <div class="ai-mod">
+            <span class="ai-mod-icon"><i class="ph ph-kanban"></i></span>
+            <div class="ai-mod-name">Sprint Planner</div>
+            <div class="ai-mod-sub">Agile sprint breakdowns aligned to freelancer availability</div>
+          </div>
+          <div class="ai-mod">
+            <span class="ai-mod-icon"><i class="ph ph-trend-down"></i></span>
+            <div class="ai-mod-name">COCOMO-II Estimator</div>
+            <div class="ai-mod-sub">Person-days, team size, cost projections in under 5 seconds</div>
+          </div>
+          <div class="ai-mod">
+            <span class="ai-mod-icon"><i class="ph ph-microscope"></i></span>
+            <div class="ai-mod-name">Risk Analyzer</div>
+            <div class="ai-mod-sub">Skill-based delay prediction and buffer optimisation</div>
+          </div>
+          <div class="ai-mod">
+            <span class="ai-mod-icon"><i class="ph ph-handshake"></i></span>
+            <div class="ai-mod-name">Negotiation Engine</div>
+            <div class="ai-mod-sub">Real-time recalculation as scope variables are adjusted</div>
+          </div>
+        </div>
+      </div>
+      <div class="ai-right reveal reveal-d3">
+        <div class="terminal-header">
+          <div class="t-dot r"></div><div class="t-dot y"></div><div class="t-dot g"></div>
+          <span class="t-title">ai-intelligence-engine.js</span>
+        </div>
+        <div class="t-line"><span class="t-prompt">$</span><span class="t-cmd">estimate --project "E-Commerce Platform"</span></div>
+        <div class="t-line"><span class="t-prompt">›</span><span class="t-out">Analysing scope descriptors...</span></div>
+        <div class="t-line"><span class="t-prompt">›</span><span class="t-out">Running COCOMO-II model...</span></div>
+        <div class="t-line"><span class="t-prompt">›</span><span class="t-out">Effort:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="t-val">34 person-days</span></div>
+        <div class="t-line"><span class="t-prompt">›</span><span class="t-out">Team size:&nbsp;&nbsp;&nbsp;</span><span class="t-val">3 freelancers</span></div>
+        <div class="t-line"><span class="t-prompt">›</span><span class="t-out">Cost range:&nbsp;&nbsp;</span><span class="t-val">PKR 280,000 – 340,000</span></div>
+        <div class="t-line"><span class="t-prompt">›</span><span class="t-out">Risk buffer:&nbsp;</span><span class="t-val">+12% (moderate complexity)</span></div>
+        <div class="t-line"><span class="t-prompt">›</span><span class="t-out">Milestones:&nbsp;&nbsp;</span><span class="t-val">6 auto-generated</span></div>
+        <div class="t-line"><span class="t-prompt">›</span><span class="t-out">Sprints:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="t-val">4 × 1-week cycles</span></div>
+        <div class="t-line"><span class="t-prompt">$</span><span class="t-cmd"><span class="t-cursor"></span></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TECH -->
+<section id="tech" class="tech-section">
+  <div class="container">
+    <div class="section-label reveal">Technology Stack</div>
+    <h2 class="big-title reveal reveal-d1">Production-grade<br>tools, end to end</h2>
+    <div class="tech-scrolltrack reveal reveal-d2">
+      <div class="tech-chip">Next.js <span class="ver">v16</span></div>
+      <div class="tech-chip">Node.js <span class="ver">v22.13</span></div>
+      <div class="tech-chip">MongoDB <span class="ver">v8.2</span></div>
+      <div class="tech-chip">Stripe API <span class="ver">2026</span></div>
+      <div class="tech-chip">Zindagi API <span class="ver">2026</span></div>
+      <div class="tech-chip">Sumsub <span class="ver">v2.0</span></div>
+      <div class="tech-chip">Socket.io</div>
+      <div class="tech-chip">JWT Auth</div>
+      <div class="tech-chip">OpenAI API</div>
+      <div class="tech-chip">Vercel</div>
+      <div class="tech-chip">Mongoose ORM</div>
+      <div class="tech-chip">REST APIs</div>
+      <div class="tech-chip">Figma <span class="ver">2026</span></div>
+      <div class="tech-chip">MS Visio <span class="ver">2019</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- DOCS -->
+<section id="docs" class="pad" style="border-top:1px solid var(--border);">
+  <div class="container">
+    <div class="section-label reveal">Project Resources</div>
+    <h2 class="big-title reveal reveal-d1">Formal<br>deliverables</h2>
+    
+    <div class="docs-grid">
+      <a href="https://docs.google.com/presentation/d/11CYIGtWTAs_5nrA7ta24SXKjAUomABdA9UPZAdHFmGA/edit?usp=sharing" target="_blank" class="doc-card reveal reveal-d1">
+        <span class="doc-icon"><i class="ph ph-presentation-chart"></i></span>
+        <div class="doc-name">Pitch Deck</div>
+        <div class="doc-type">Presentation Slides</div>
+      </a>
+      <a href="https://www.figma.com/design/qjgVZBV76NFOB0bvQaQ0xf/SRS---PakFreelance-Mockups?m=auto&t=Db7tpVxGakCrNMId-1" target="_blank" class="doc-card reveal reveal-d2">
+        <span class="doc-icon"><i class="ph ph-paint-brush"></i></span>
+        <div class="doc-name">Figma Designs</div>
+        <div class="doc-type">UI Mockups & Prototypes</div>
+      </a>
+      <a href="https://docs.google.com/document/d/1LHX1Exx2CNkQwZlAIZk3H9vVqvamvk7EOCHVCfFUK-U/edit?usp=sharing" target="_blank" class="doc-card reveal reveal-d3">
+        <span class="doc-icon"><i class="ph ph-map-trifold"></i></span>
+        <div class="doc-name">Scope Document</div>
+        <div class="doc-type">Product Vision & System Design</div>
+      </a>
+      <a href="https://docs.google.com/document/d/1jfessOyXEAI83jFR57Z0xJZWqOjwQzvM28IgHBNtDrk/edit?usp=sharing" target="_blank" class="doc-card reveal reveal-d4">
+        <span class="doc-icon"><i class="ph ph-file-text"></i></span>
+        <div class="doc-name">SRS Document</div>
+        <div class="doc-type">System Architecture & Specifications</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section id="team" class="team-section">
+  <div class="container" style="text-align:center;">
+    <div class="section-label reveal" style="justify-content:center;">The Team</div>
+    <h2 class="big-title reveal reveal-d1">Two engineers.<br>One platform.</h2>
+    <div class="team-grid">
+      <div class="tm-card reveal reveal-d3">
+        <div class="tm-ring">MH</div>
+        <div class="tm-name">M. Haseeb Amjad</div>
+        <div class="tm-role">Frontend Engineer</div>
+        <div class="tm-id">CIIT/SP23-BSE-035/ISB</div>
+      </div>
+      <div class="tm-card reveal reveal-d2">
+        <div class="tm-ring">MK</div>
+        <div class="tm-name">Mahad Kamran</div>
+        <div class="tm-role">Backend Engineer</div>
+        <div class="tm-id">CIIT/SP23-BSE-023/ISB</div>
+      </div>
+    </div>
+    <p class="supervisor-note reveal reveal-d4">Supervised by <strong>Mr. Aamir Shabbir Pare</strong><br>Department of Computer Science · COMSATS University Islamabad</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="foot-inner">
+      <div class="foot-logo">Pak<em>Freelance</em></div>
+      <div class="foot-center">
+        BS Software Engineering · 2023–2027<br>
+        COMSATS University Islamabad
+      </div>
+      <div class="foot-right">
+        © 2026 PakFreelance<br>
+        All rights reserved
+      </div>
+    </div>
+  </div>
+</footer>
+
+<a href="#" id="back-to-top" title="Back to top">
+  <i class="ph ph-arrow-up"></i>
+</a>
+
+<script>
+// ── CURSOR ──
+const cur = document.getElementById('cursor');
+const ring = document.getElementById('cursor-ring');
+let mx = window.innerWidth / 2, my = window.innerHeight / 2, rx = window.innerWidth / 2, ry = window.innerHeight / 2;
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+function animCursor() {
+  cur.style.left = mx - 6 + 'px';
+  cur.style.top = my - 6 + 'px';
+  rx += (mx - rx - 18) * 0.12;
+  ry += (my - ry - 18) * 0.12;
+  ring.style.left = rx + 'px';
+  ring.style.top = ry + 'px';
+  requestAnimationFrame(animCursor);
+}
+animCursor();
+
+// ── CANVAS PARTICLES ──
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let W, H, particles = [];
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+class Particle {
+  constructor() { this.reset(); }
+  reset() {
+    this.x = Math.random() * W;
+    this.y = Math.random() * H;
+    this.vx = (Math.random() - 0.5) * 0.3;
+    this.vy = (Math.random() - 0.5) * 0.3;
+    this.r = Math.random() * 1.2 + 0.3;
+    this.alpha = Math.random() * 0.4 + 0.05;
+    this.life = 0;
+    this.maxLife = Math.random() * 400 + 200;
+  }
+  update() {
+    this.x += this.vx;
+    this.y += this.vy;
+    this.life++;
+    if (this.life > this.maxLife || this.x < 0 || this.x > W || this.y < 0 || this.y > H) this.reset();
+  }
+  draw() {
+    const fade = Math.sin((this.life / this.maxLife) * Math.PI);
+    ctx.globalAlpha = this.alpha * fade;
+    ctx.fillStyle = '#00E87A';
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+for (let i = 0; i < 120; i++) particles.push(new Particle());
+
+// Connection lines
+function drawLines() {
+  ctx.globalAlpha = 1;
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i + 1; j < particles.length; j++) {
+      const dx = particles[i].x - particles[j].x;
+      const dy = particles[i].y - particles[j].y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 100) {
+        ctx.globalAlpha = (1 - dist/100) * 0.06;
+        ctx.strokeStyle = '#00E87A';
+        ctx.lineWidth = 0.5;
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x, particles[i].y);
+        ctx.lineTo(particles[j].x, particles[j].y);
+        ctx.stroke();
+      }
+    }
+  }
+}
+
+function animParticles() {
+  ctx.clearRect(0, 0, W, H);
+  particles.forEach(p => { p.update(); p.draw(); });
+  drawLines();
+  requestAnimationFrame(animParticles);
+}
+animParticles();
+
+// ── NAV SCROLL ──
+const nav = document.getElementById('mainNav');
+const btt = document.getElementById('back-to-top');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 60);
+  if (window.scrollY > 400) {
+    btt.classList.add('visible');
+  } else {
+    btt.classList.remove('visible');
+  }
+});
+
+// ── SCROLL REVEAL ──
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+reveals.forEach(r => observer.observe(r));
+</script>
+</body>
+</html>
